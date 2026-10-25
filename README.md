@@ -1,31 +1,75 @@
 # dsh-ios-connect
 
-让你的 iPhone 出现在 DeepSeek Harness 的右侧栏里 —— 实时画面，用 USB 线连着的真机。
-
-同时给 agent 一组工具：截图、点、滑、打字、读当前界面的控件树。它能看到你手机上的东西，也能动手。
+把一台插在 USB 上的 iPhone 接进 DeepSeek Harness：右侧栏里是它的实时画面，agent 能在这块屏幕上点、滑、打字。
 
 > 只在 Windows + USB 下验证过。macOS 理论上也能跑（go-ios 有 darwin 版），但没测。
 
 ---
 
-## 它解决什么
+## 能做什么
 
-在 Windows 上用 AI 操作 iPhone，麻烦的地方从来不是「怎么点一下」，是前面那一长串：找 go-ios、挂开发者镜像、起隧道、查 WebDriverAgent 的包名（每次重签都会变）、端口转发、断线重连。任何一环断了，表现都是「没反应」，你还得自己猜断在哪一环。
+手机上你用手指能做的那些事，它基本都能做：
 
-这个插件把这些全接过来，只留三件必须你自己做的事：插线、点信任、用你的 Apple ID 给 WebDriverAgent 签一次名。
+- **开 App** —— 按包名直接开，不用在桌面翻页找图标
+- **看屏幕** —— 截图，或者读控件树（每个控件的名字和坐标都在）
+- **动手** —— 点、长按、滑、滚
+- **打字** —— 往聚焦的输入框里打，中英文都行
+- **等** —— 等某段文字出现、等画面稳定，再动手，省掉一堆「操作完截一张看看」
+- **解锁** —— 给了锁屏密码，它能自己点亮、上滑、一位一位输密码
+
+所以你可以这样说：
+
+> 打开小红书，找到第一条笔记，点进去，给它点个赞。
+
+它自己开 App、截图、认坐标、点击、再截图核对数字从 562 变成 563。全程不用你碰手机。
+
+**做不到的**，也提前说清楚：面容 / 指纹确认（支付、iCloud 授权这类）、锁屏状态下的操作、任何需要真人点「允许」的系统弹窗。这些是 iOS 的硬边界，不是插件偷懒。
+
+---
+
+## 解决什么问题
+
+在 Windows 上用 AI 控真机 iPhone，卡的从来不是「怎么点一下」—— 点一下是最好写的部分。麻烦的是它前面那一长串：
+
+| 环节 | 没有插件的时候 |
+|---|---|
+| 拿到 go-ios | 去 GitHub releases 翻 zip，被墙了还得找代理 |
+| 挂开发者镜像 | iOS 17 起必须挂 DDI。go-ios 会卡在 `x509: certificate signed by unknown authority`，它不认 Windows 证书库，得自己换 pymobiledevice3 |
+| 起隧道 | 端口冲突、后台化、断了要重来 |
+| 查 WebDriverAgent 包名 | 每次重签都会变。写死在配置里，下次连接就报错 |
+| 端口转发 | 8100 和 9100，两个 |
+| 断线重连 | 睡眠、拔线、WDA 崩了，都得自己发现 |
+
+任何一环断了，表现都是同一个：**没反应**。然后你得自己猜断在哪。
+
+这个插件把这些全接过来。剩下三件必须你自己来，因为都需要你的人和你的 Apple ID 在场：
+
+1. 插线，手机上点「信任」
+2. 开开发者模式（一次性，之后手机会重启）
+3. 用你的 Apple ID 给 WebDriverAgent 签一次名（免费证书 7 天，到期重签）
+
+其余全是插件的活。装完插件后包里自带 go-ios 和 WebDriverAgent，不用再去下任何东西。
 
 ---
 
 ## 1. 装插件
 
 ```powershell
-cd $env:USERPROFILE\.dsh\profiles\desktop
-pnpm add dsh-ios-connect
+dsh plugin --profile desktop add dsh-ios-connect
 ```
 
-然后编辑同目录下的 `package.json`，把 `dsh-ios-connect` 加进 `dsh.profile.bundles` 数组里。
+这条命令会转发给 pnpm，把包装进你的 desktop profile。
+
+装完还有一步：打开 `%USERPROFILE%\.dsh\profiles\desktop\package.json`，把 `"dsh-ios-connect"` 加进 `dsh.profile.bundles` 数组里 —— 不然包在，但 DSH 不会加载它。
 
 重启 DSH。
+
+> `dsh` 不在 PATH 里的话，等价写法是进 profile 目录跑 pnpm：
+>
+> ```powershell
+> cd $env:USERPROFILE\.dsh\profiles\desktop
+> pnpm add dsh-ios-connect
+> ```
 
 包里有 `bin/ios.exe`（go-ios）和 `wda/WebDriverAgent.ipa` —— 后面几步要用的两样东西，装完插件就有了，不用另外下。
 
