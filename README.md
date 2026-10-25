@@ -1,4 +1,4 @@
-﻿# dsh-ios-connect
+# dsh-ios-connect
 
 让你的 iPhone 出现在 DeepSeek Harness 的右侧栏里 —— 实时画面，用 USB 线连着的真机。
 
@@ -16,36 +16,53 @@
 
 ---
 
-## 装之前先准备
+## 1. 装插件
 
-### 1. 让 Windows 能认出 iPhone
+```powershell
+cd $env:USERPROFILE\.dsh\profiles\desktop
+pnpm add dsh-ios-connect
+```
 
-装 **Apple Devices**（微软商店里免费的那个），或者完整的 iTunes。
+然后编辑同目录下的 `package.json`，把 `dsh-ios-connect` 加进 `dsh.profile.bundles` 数组里。
+
+重启 DSH。
+
+包里有 `bin/ios.exe`（go-ios）和 `wda/WebDriverAgent.ipa` —— 后面几步要用的两样东西，装完插件就有了，不用另外下。
+
+---
+
+## 2. 准备 iPhone
+
+### 让 Windows 能认出 iPhone
+
+装 **Apple Devices**（微软商店里免费的那个）。
 
 装完插线，手机弹「要信任此电脑吗」→ 点信任 → 输密码。
 
+> **别装 iTunes。** 2026-10 那版 `iTunes64Setup.exe` 实测装完启动即崩（`KERNELBASE.dll`、异常码 `0xe06d7363`），`Apple Application Support` 一整套组件根本没落地，`Apple Mobile Device Service` 一直停在 Stopped。商店那个 Apple Devices 就够。
+
 > 检查是否认出来了：设备管理器里应该出现 `Apple iPhone`。没有的话插件也没辙 —— 这是驱动层的事，插件没有权限替你装。
 
-### 2. 开开发者模式
+### 开开发者模式
 
 iPhone 上：设置 → 隐私与安全性 → 开发者模式。
 
-如果**根本看不到这一项**（正常，默认是隐藏的），插上线后跑一次：
+如果**根本看不到这一项**（正常，默认是隐藏的），插上线后跑一次（用插件包里那个 exe，`ios` 不在 PATH 里）：
 
 ```powershell
-ios devmode reveal
+& "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\dsh-ios-connect\bin\ios.exe" devmode reveal
 ```
 
 然后回去就能看到了。打开，手机会重启，重启后确认一次。
 
-### 3. 装 WebDriverAgent
+### 装 WebDriverAgent
 
 这是「手」。没有它，插件只能看不能动。
 
 **ipa 随插件一起来了**，不用单独下 —— 装好插件后它在：
 
 ```
-<插件目录>/wda/WebDriverAgent.ipa
+%USERPROFILE%\.dsh\profiles\desktop\node_modules\dsh-ios-connect\wda\WebDriverAgent.ipa
 ```
 
 插件面板上会直接把这个路径显示出来，签名工具里选它就行。
@@ -63,22 +80,7 @@ ios devmode reveal
 
 ---
 
-## 装插件
-
-```powershell
-cd $env:USERPROFILE\.dsh\profiles\desktop
-pnpm add dsh-ios-connect
-```
-
-然后编辑同目录下的 `package.json`，把 `dsh-ios-connect` 加进 `dsh.profile.bundles` 数组里。
-
-重启 DSH。
-
-包里有 `bin/ios.exe`（go-ios）和 `wda/WebDriverAgent.ipa`，装完就能用，不用再等下载。
-
----
-
-## 用
+## 3. 用
 
 右侧栏会多一个 **iPhone** 标签。点「连接」，等十几秒，手机画面就上来了。
 
