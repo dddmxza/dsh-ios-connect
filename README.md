@@ -95,6 +95,13 @@ pnpm add dsh-ios-connect
 | `phone_swipe` | 滑一段 |
 | `phone_type` | 打字 |
 | `phone_ui` | 读控件树（XML），每个控件带名字和坐标 |
+| `phone_find` | 按文字找控件，直接给能点的坐标 |
+| `phone_wait` | 等某段文字出现，或等画面稳定 |
+| `phone_launch` | 按包名直接开 App（比在桌面找图标稳） |
+| `phone_home` | 回桌面 |
+| `phone_unlock` | 点亮 + 上滑 + 输密码（密码要写进 `passcode`） |
+
+后面五个是为了少走弯路：`phone_find` 和 `phone_wait` 能省掉一大堆「操作完再截一张图看看」。不装它们也能用，只是慢。
 
 ### 一个必须知道的坑：坐标是 point，不是像素
 
@@ -119,7 +126,8 @@ pnpm add dsh-ios-connect
   "autoDownload": true,
   "streamScale": 50,
   "streamQuality": 65,
-  "streamFps": 20
+  "streamFps": 20,
+  "passcode": ""
 }
 ```
 
