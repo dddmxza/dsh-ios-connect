@@ -12,3 +12,6 @@ config.json
 
 # 密码只存在用户目录，绝不进包
 .env
+
+# go-ios 丢下的本机身份密钥对，含 privateKey，永远不进包
+selfIdentity.plist
