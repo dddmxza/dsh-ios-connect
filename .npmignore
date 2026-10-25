@@ -1,0 +1,11 @@
+# 这个文件只服务 npm pack。有它在，npm 就不再看 .gitignore，
+# 所以 bin/ios.exe 和 wda/*.ipa 虽然不入 git，但会进 npm 包 —— 这是有意的：
+# 仓库不带 23 MB 二进制，装插件的人拿到的是完整可用的一份。
+
+node_modules/
+.data/
+.runtime/
+devimages/
+*.log
+.DS_Store
+config.json

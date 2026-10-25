@@ -1,0 +1,56 @@
+{
+  "name": "dsh-ios-connect",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness plugin: show your iPhone screen live in the right sidebar, and let the agent tap, swipe and type on it over USB.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "wda",
+    "cordis.patch.yml",
+    "README.md",
+    "THIRD-PARTY-NOTICES.md"
+  ],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "ios",
+    "iphone",
+    "webdriveragent",
+    "wda",
+    "go-ios",
+    "sideload"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dddmxza/dsh-ios-connect.git"
+  },
+  "homepage": "https://github.com/dddmxza/dsh-ios-connect#readme",
+  "bugs": {
+    "url": "https://github.com/dddmxza/dsh-ios-connect/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "slots"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.6 <0.3.0"
+  }
+}

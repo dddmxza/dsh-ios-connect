@@ -1,0 +1,4 @@
+# dsh-ios-connect bundle layer: loaded by dsh after install.
+- insert:
+    - id: dsh-ios-connect
+      name: dsh-ios-connect
