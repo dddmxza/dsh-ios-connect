@@ -199,9 +199,11 @@ foreach ($p in 8100,9100,28100,28101,8770) {
 |---|---|
 | 操作 | ready 状态下拔线等 10 秒，插回去，然后直接 `GET $b.frame` |
 | 期望 | 理想情况自动恢复。**这一条目前大概率不通过**，因为 startChain 是线性的，没有 keepAlive 重连 |
-| 结果 | **不通过，已修**（2026-10-26）。拔了再插，`GET $b.status` 仍然回 `phase=ready`、`message=已连接`，而 `GET $b.frame` 报 500 `截图失败：read ECONNRESET`。两个毛病：一是旧路由不会自己断，状态在说假话；二是没有任何重连。已加 `markLinkLost()`：撞上 `ECONNRESET / ECONNREFUSED / ETIMEDOUT / EHOSTUNREACH / socket hang up / EPIPE` 就把 phase 掀成 error，并在后台自动 `startChain()` 一次（30 秒内只试一次，防抖）。`phone_screenshot` 撞上也走这条，直接回「过十几秒再试」。待重启后复测。 |
+| 结果 | **通过**（2026-10-26 复测）。拔了插回，第一帧 500，`phase` 随即自己变成 `starting`「正在起隧道」，8100 / 9100 换了新 PID，约 30 秒后回到 `ready`，`/frame` 回 200、1.3 MB。全程没点连接。 |
 
-这条要是不过，说明得补一个断线重连。记下来。
+这条修之前是不通过的，两个毛病：旧路由不会自己断，`phase` 一直骗人说 `ready`；而且完全没有重连。现在 `markLinkLost()` 把 `ECONNRESET / ECONNREFUSED / ETIMEDOUT / EHOSTUNREACH / socket hang up / EPIPE` 判成断线，`kickReconnect()` 在后台重起一次（30 秒防抖），`phone_screenshot` 撞上也走这条，直接回「过十几秒再试」。
+
+顺带挖出一个更阴的问题：DSH 重启之后，插件丢了上一轮那些 go-ios 子进程的句柄，可进程还活着，占着 8100 / 9100 / 28100，新的 forward 绑不上，状态却报「WDA 起来了但连不上」，把人引去查证书。已在 `startChain()` 开头加 `killStaleIos()`：扫这几个端口，用 `tasklist` 确认占用者是 `ios.exe` 才 `taskkill`，别的程序的端口一概不碰。
 
 ### B5 手机灭屏时侧栏显示什么
 
@@ -228,7 +230,8 @@ foreach ($p in 8100,9100,28100,28101,8770) {
 
 ## 已知缺口
 
-- **断线自愈（已补，待复测）**：原来拔线再插回要手动点连接，实测还会卡在假的 `ready`。已加 `markLinkLost()` + 后台 `kickReconnect()`（30 秒防抖），重启后按 B4 复测。
+- **断线自愈**：已修并在 B4 复测通过。拔线再插回，约 30 秒自己恢复，不用点连接。
+- **残留进程**：已修。起链路前会清掉占着端口的旧 `ios.exe`。DSH 重启过之后最容易撞上这个，表现是「WDA 起来了但连不上」，以前会误导人去查证书。
 - **证书过期查不出来**：免费签名七天到期，插件看不出来，只有连接失败时才显形。
 - **只支持 Windows x64**：macOS 和 Linux 没做，包里只带了 win32-x64 的 `ios.exe`。
 - **侧栏只读**：能看不能点。要在侧栏直接操作手机得另做一层转发。
