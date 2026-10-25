@@ -11,3 +11,7 @@ bin/*.exe
 wda/*.ipa
 # 配置现在放用户目录，这两个是历史遗留的兜底
 .env
+# go-ios 会在工作目录里丢这个：本机跟苹果设备通信的身份密钥对。
+# 里面是 privateKey，绝对不能进仓库。
+selfIdentity.plist
+*.plist.bak
