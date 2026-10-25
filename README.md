@@ -99,7 +99,7 @@ pnpm add dsh-ios-connect
 | `phone_wait` | 等某段文字出现，或等画面稳定 |
 | `phone_launch` | 按包名直接开 App（比在桌面找图标稳） |
 | `phone_home` | 回桌面 |
-| `phone_unlock` | 点亮 + 上滑 + 输密码（密码要写进 `passcode`） |
+| `phone_unlock` | 点亮 + 上滑 + 输密码（密码用 `DSH_IOS_PASSCODE` 给，见下） |
 
 后面五个是为了少走弯路：`phone_find` 和 `phone_wait` 能省掉一大堆「操作完再截一张图看看」。不装它们也能用，只是慢。
 
@@ -140,6 +140,18 @@ pnpm add dsh-ios-connect
 - `streamFps`：帧率上限。默认 20，实测能跑到 18.9。
 
 调到 50/65/20 时带宽和默认的 828 宽基本一样，帧率从 9.6 涨到 18.9。侧栏拉宽了可以试试 `streamScale: 75`。
+
+### 环境变量（优先级高于 config.json）
+
+| 变量 | 顶掉的字段 |
+|---|---|
+| `DSH_IOS_PATH` | `iosPath` |
+| `DSH_IOS_UDID` | `udid` |
+| `DSH_IOS_BUNDLE_ID` | `bundleId` |
+| `DSH_IOS_PASSCODE` | `passcode` |
+| `DSH_IOS_DATA_DIR` | `dataDir` |
+
+**锁屏密码建议只走环境变量，不要落到文件里。** 写进 `config.json` 也不会被 git 或 npm 带走（两边都排除了这个文件），但一次保存就能把密码留在盘上；用 `DSH_IOS_PASSCODE` 给的密码不会被写回 `config.json`，配置接口也永远不回传它，只告诉你 `hasPasscode` 是 true 还是 false。
 
 ---
 
