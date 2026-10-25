@@ -1,4 +1,4 @@
-# dsh-ios-connect
+﻿# dsh-ios-connect
 
 让你的 iPhone 出现在 DeepSeek Harness 的右侧栏里 —— 实时画面，用 USB 线连着的真机。
 
@@ -113,7 +113,16 @@ pnpm add dsh-ios-connect
 
 ## 配置
 
-插件目录下的 `config.json`，一般不用动：
+配置不在插件目录里，在用户目录：
+
+```
+~/.dsh-ios-connect/config.json    普通配置
+~/.dsh-ios-connect/.env           锁屏密码（只有这一项）
+```
+
+放用户目录是因为插件装在 `node_modules` 下，升级时整包重建，写在里面会跟着丢掉。
+
+`config.json` 一般不用动：
 
 ```json
 {
@@ -126,8 +135,7 @@ pnpm add dsh-ios-connect
   "autoDownload": true,
   "streamScale": 50,
   "streamQuality": 65,
-  "streamFps": 20,
-  "passcode": ""
+  "streamFps": 20
 }
 ```
 
@@ -141,7 +149,18 @@ pnpm add dsh-ios-connect
 
 调到 50/65/20 时带宽和默认的 828 宽基本一样，帧率从 9.6 涨到 18.9。侧栏拉宽了可以试试 `streamScale: 75`。
 
-### 环境变量（优先级高于 config.json）
+### 锁屏密码
+
+在**插件设置页**的「锁屏密码」卡片里填一次就行，不用碰文件。填了之后智能体能替你解锁、点开 App；没填就只点亮屏幕上滑。
+
+密码落在 `~/.dsh-ios-connect/.env` 的 `DSH_IOS_PASSCODE` 一行：
+
+- 不在插件目录里，npm 升级不会带走；
+- 不进 git，也不进 npm 包；
+- 接口永远不回传密码，只回 `hasPasscode` 是 true 还是 false —— 所以卡片上只可能显示「已设置」；
+- 以前写在 `config.json` 里的密码，保存时会被挪进 `.env` 并从 `config.json` 删掉。
+
+### 环境变量（优先级高于两个文件）
 
 | 变量 | 顶掉的字段 |
 |---|---|
@@ -151,7 +170,7 @@ pnpm add dsh-ios-connect
 | `DSH_IOS_PASSCODE` | `passcode` |
 | `DSH_IOS_DATA_DIR` | `dataDir` |
 
-**锁屏密码建议只走环境变量，不要落到文件里。** 写进 `config.json` 也不会被 git 或 npm 带走（两边都排除了这个文件），但一次保存就能把密码留在盘上；用 `DSH_IOS_PASSCODE` 给的密码不会被写回 `config.json`，配置接口也永远不回传它，只告诉你 `hasPasscode` 是 true 还是 false。
+读配置的顺序是 `config.json` → `.env` → 进程环境变量，后面的盖前面的。想完全不落盘，就用环境变量给密码。
 
 ---
 

@@ -9,3 +9,5 @@ devimages/
 config.json
 bin/*.exe
 wda/*.ipa
+# 配置现在放用户目录，这两个是历史遗留的兜底
+.env
