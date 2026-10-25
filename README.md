@@ -116,11 +116,22 @@ pnpm add dsh-ios-connect
   "wdaPort": 8100,
   "mjpegPort": 9100,
   "dataDir": "",
-  "autoDownload": true
+  "autoDownload": true,
+  "streamScale": 50,
+  "streamQuality": 65,
+  "streamFps": 20
 }
 ```
 
 `iosPath` 留空就自己找（插件下 `bin/` → `.runtime/bin/` → PATH → SideTap 装的位置）；包里那份在就永远用不到下载（`autoDownload: false` 可关）。`bundleId` 留空就在启动时现查 —— **建议留空**，重签之后包名会变，写死了下次就报错。
+
+后三个是画面的清晰度和流畅度，启动链路时自动设给手机：
+
+- `streamScale`：出多大。100 是手机原尺寸（828 宽），50 是一半（414 宽）。侧栏就那么宽，让手机直接按 414 出图比出 828 再让浏览器缩小清楚得多 —— **那一缩就是画面发糊的原因**。
+- `streamQuality`：单帧压多狠，1-100。
+- `streamFps`：帧率上限。默认 20，实测能跑到 18.9。
+
+调到 50/65/20 时带宽和默认的 828 宽基本一样，帧率从 9.6 涨到 18.9。侧栏拉宽了可以试试 `streamScale: 75`。
 
 ---
 
