@@ -1,6 +1,6 @@
 {
   "name": "dsh-ios-connect",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "DeepSeek Harness plugin: show your iPhone screen live in the right sidebar, and let the agent tap, swipe and type on it over USB.",
   "license": "Apache-2.0",
   "type": "module",
